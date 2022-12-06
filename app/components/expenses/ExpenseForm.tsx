@@ -1,10 +1,14 @@
-import { Link } from '@remix-run/react';
+import { Form, Link, useActionData, useTransition } from '@remix-run/react';
 
 function ExpenseForm() {
 	const today = new Date().toISOString().slice(0, 10); // yields something like 2023-09-10
+	const validationErrors = useActionData();
+	const transition = useTransition();
+
+	const isSubmitting = transition.state !== 'idle';
 
 	return (
-		<form method='post' className='form' id='expense-form'>
+		<Form method='post' className='form' id='expense-form'>
 			<p>
 				<label htmlFor='title'>Expense Title</label>
 				<input
@@ -39,11 +43,20 @@ function ExpenseForm() {
 					/>
 				</p>
 			</div>
+			{validationErrors && (
+				<ul>
+					{Object.values(validationErrors).map((error) => (
+						<li key={error}>{error}</li>
+					))}
+				</ul>
+			)}
 			<div className='form-actions'>
-				<button>Save Expense</button>
+				<button disabled={isSubmitting}>
+					{isSubmitting ? 'Saving...' : 'Save Expense'}
+				</button>
 				<Link to='..'>Cancel</Link>
 			</div>
-		</form>
+		</Form>
 	);
 }
 

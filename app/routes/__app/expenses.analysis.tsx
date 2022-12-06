@@ -1,6 +1,6 @@
 import ExpenseStatistics from '~/components/expenses/ExpenseStatistics';
 import Chart from '~/components/expenses/Chart';
-import DUMMY_EXPENSES from '~/components/data/expenses.data';
+import DUMMY_EXPENSES from '~/util/expenses.data';
 import expensesStyles from '~/styles/expenses.css';
 
 export default function ExpensesAnalysisPage() {
