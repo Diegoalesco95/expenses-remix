@@ -1,14 +1,44 @@
-import { Form, Link, useActionData, useTransition } from '@remix-run/react';
+import type { Expense } from '~/interfaces/expense.interface';
+import {
+	Form,
+	Link,
+	useActionData,
+	useMatches,
+	useParams,
+	useTransition,
+} from '@remix-run/react';
 
 function ExpenseForm() {
 	const today = new Date().toISOString().slice(0, 10); // yields something like 2023-09-10
 	const validationErrors = useActionData();
+	const params = useParams();
 	const transition = useTransition();
+	const matches = useMatches();
+	const expenses = matches.find(
+		(match) => match.id === 'routes/__app/expenses',
+	)?.data as Expense[];
+
+	const expenseData = expenses?.find((expense) => expense.id === params.id);
+
+	const defaultValues = expenseData
+		? {
+				title: expenseData.title,
+				amount: expenseData.amount,
+				date: expenseData.date,
+		  }
+		: {
+				title: '',
+				amount: '',
+				date: '',
+		  };
 
 	const isSubmitting = transition.state !== 'idle';
 
 	return (
-		<Form method='post' className='form' id='expense-form'>
+		<Form
+			method={expenseData ? 'patch' : 'post'}
+			className='form'
+			id='expense-form'>
 			<p>
 				<label htmlFor='title'>Expense Title</label>
 				<input
@@ -17,6 +47,7 @@ function ExpenseForm() {
 					name='title'
 					required
 					maxLength={30}
+					defaultValue={defaultValues.title}
 				/>
 			</p>
 
@@ -30,6 +61,7 @@ function ExpenseForm() {
 						min='0'
 						step='0.01'
 						required
+						defaultValue={defaultValues.amount}
 					/>
 				</p>
 				<p>
@@ -40,6 +72,11 @@ function ExpenseForm() {
 						name='date'
 						max={today}
 						required
+						defaultValue={
+							defaultValues.date
+								? defaultValues.date.slice(0, 10)
+								: ''
+						}
 					/>
 				</p>
 			</div>

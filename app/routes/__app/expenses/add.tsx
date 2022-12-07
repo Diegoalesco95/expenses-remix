@@ -1,4 +1,6 @@
 import type { ActionFunction } from '@remix-run/node';
+import type { Expense } from '~/interfaces/expense.interface';
+
 import { redirect } from '@remix-run/node';
 import { useNavigate } from '@remix-run/react';
 import ExpenseForm from '~/components/expenses/ExpenseForm';
@@ -22,7 +24,7 @@ export default function AddExpensesPage() {
 
 export const action: ActionFunction = async ({ request }) => {
 	const formaData = await request.formData();
-	const expensesData = Object.fromEntries(formaData);
+	const expensesData = Object.fromEntries(formaData) as unknown as Expense;
 
 	try {
 		validateExpenseInput(expensesData);
