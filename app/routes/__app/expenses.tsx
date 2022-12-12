@@ -2,6 +2,7 @@ import type { LoaderFunction } from '@remix-run/node';
 import { Link, Outlet, useLoaderData } from '@remix-run/react';
 import { FaDownload, FaPlus } from 'react-icons/fa';
 import ExpensesList from '~/components/expenses/ExpensesList';
+import { requireUserSession } from '~/data/auth.server';
 import { getExpenses } from '~/data/expenses.server';
 
 export default function ExpenseLayout() {
@@ -27,6 +28,8 @@ export default function ExpenseLayout() {
 	);
 }
 
-export const loader: LoaderFunction = () => {
-	return getExpenses();
+export const loader: LoaderFunction = async ({ request }) => {
+	const userId = await requireUserSession(request);
+
+	return getExpenses(userId);
 };

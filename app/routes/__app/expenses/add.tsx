@@ -7,6 +7,7 @@ import ExpenseForm from '~/components/expenses/ExpenseForm';
 import Modal from '~/components/util/Modal';
 import { addExpense } from '~/data/expenses.server';
 import { validateExpenseInput } from '~/data/validation.server';
+import { requireUserSession } from '~/data/auth.server';
 
 export default function AddExpensesPage() {
 	const navigate = useNavigate();
@@ -23,6 +24,7 @@ export default function AddExpensesPage() {
 }
 
 export const action: ActionFunction = async ({ request }) => {
+	const userId = await requireUserSession(request);
 	const formaData = await request.formData();
 	const expensesData = Object.fromEntries(formaData) as unknown as Expense;
 
@@ -32,6 +34,6 @@ export const action: ActionFunction = async ({ request }) => {
 		return error;
 	}
 
-	await addExpense(expensesData);
+	await addExpense(expensesData, userId);
 	return redirect('/expenses');
 };

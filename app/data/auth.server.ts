@@ -31,11 +31,44 @@ async function getExistingUser(email) {
 }
 
 function throwError(message: string, code: number) {
-	const error = new Error(
-		'Could not log you in, please check the provided credentials.',
-	);
-	error.status = 401;
+	const error = new Error(message);
+	error.status = code;
 	throw error;
+}
+
+export async function getUserFromSession(request: Request) {
+	const session = await sessionStorage.getSession(
+		request.headers.get('Cookie'),
+	);
+	const userId = session.get('userId');
+
+	if (!userId) {
+		return null;
+	}
+
+	return userId;
+}
+
+export async function destroyUserSession(request: Request) {
+	const session = await sessionStorage.getSession(
+		request.headers.get('Cookie'),
+	);
+
+	return redirect('/', {
+		headers: {
+			'Set-Cookie': await sessionStorage.destroySession(session),
+		},
+	});
+}
+
+export async function requireUserSession(request: Request) {
+	const userId = await getUserFromSession(request);
+
+	if (!userId) {
+		throw redirect('/auth?mode=login');
+	}
+
+	return userId;
 }
 
 export async function signup({ email, password }) {

@@ -1,5 +1,7 @@
+import type { LoaderFunction } from '@remix-run/node';
 import { Outlet } from '@remix-run/react';
 import MainHeader from '~/components/navigation/MainHeader';
+import { getUserFromSession } from '~/data/auth.server';
 import marketingStyles from '~/styles/marketing.css';
 
 export default function MarketingLayout() {
@@ -10,6 +12,10 @@ export default function MarketingLayout() {
 		</>
 	);
 }
+
+export const loader: LoaderFunction = ({ request }) => {
+	return getUserFromSession(request);
+};
 
 export function links() {
 	return [

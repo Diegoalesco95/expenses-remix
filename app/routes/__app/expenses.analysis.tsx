@@ -1,3 +1,4 @@
+import type { LoaderFunction } from '@remix-run/node';
 import type { CatchBoundaryComponent } from '@remix-run/react/dist/routeModules';
 
 import { useCatch, useLoaderData } from '@remix-run/react';
@@ -7,6 +8,7 @@ import Chart from '~/components/expenses/Chart';
 import ExpenseStatistics from '~/components/expenses/ExpenseStatistics';
 import Error from '~/components/util/Error';
 import { getExpenses } from '~/data/expenses.server';
+import { requireUserSession } from '~/data/auth.server';
 
 export default function ExpensesAnalysisPage() {
 	const expenses = useLoaderData();
@@ -19,8 +21,10 @@ export default function ExpensesAnalysisPage() {
 	);
 }
 
-export async function loader() {
-	const expenses = await getExpenses();
+export const loader: LoaderFunction = async ({ request }) => {
+	const userId = await requireUserSession(request);
+
+	const expenses = await getExpenses(userId);
 
 	if (!expenses || expenses.length === 0) {
 		throw json(
@@ -35,7 +39,7 @@ export async function loader() {
 	}
 
 	return expenses;
-}
+};
 
 export const CatchBoundary: CatchBoundaryComponent = () => {
 	const caughtResponse = useCatch();

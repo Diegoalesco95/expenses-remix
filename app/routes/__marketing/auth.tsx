@@ -29,15 +29,17 @@ export const action: ActionFunction = async ({ request }) => {
 			return await signup(credentials);
 		}
 	} catch (error) {
-		if (error.status === 422) {
+		console.log('👀', error.status, error.message);
+
+		if (error.status === 422 || error.status === 401) {
 			return {
 				credentials: error.message,
 			};
 		}
 
-		console.log('👀', error);
-		
-		return error;
+		return {
+			error: error.message,
+		};
 	}
 };
 
