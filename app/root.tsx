@@ -1,4 +1,4 @@
-import type { MetaFunction } from '@remix-run/node';
+import type { ErrorBoundaryComponent, MetaFunction } from '@remix-run/node';
 import {
 	Link,
 	Links,
@@ -70,7 +70,23 @@ export function CatchBoundary() {
 	);
 }
 
-export function ErrorBoundary() {}
+export const ErrorBoundary: ErrorBoundaryComponent = ({ error }) => {
+	return (
+		<Document title='An error occurred'>
+			<main>
+				<Error title='An error occurred'>
+					<p>
+						{error.message ||
+							'Something went wrong. Please try again'}
+					</p>
+					<p>
+						Back to <Link to='/'>safety</Link>.
+					</p>
+				</Error>
+			</main>
+		</Document>
+	);
+};
 
 export function links() {
 	return [

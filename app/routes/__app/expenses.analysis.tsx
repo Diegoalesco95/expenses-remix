@@ -1,22 +1,53 @@
-import ExpenseStatistics from '~/components/expenses/ExpenseStatistics';
+import type { CatchBoundaryComponent } from '@remix-run/react/dist/routeModules';
+
+import { useCatch, useLoaderData } from '@remix-run/react';
+import { json } from '@remix-run/node';
+
 import Chart from '~/components/expenses/Chart';
-import DUMMY_EXPENSES from '~/util/expenses.data';
-import expensesStyles from '~/styles/expenses.css';
+import ExpenseStatistics from '~/components/expenses/ExpenseStatistics';
+import Error from '~/components/util/Error';
+import { getExpenses } from '~/data/expenses.server';
 
 export default function ExpensesAnalysisPage() {
+	const expenses = useLoaderData();
+
 	return (
 		<main>
-			<Chart expenses={DUMMY_EXPENSES} />
-			<ExpenseStatistics expenses={DUMMY_EXPENSES} />
+			<Chart expenses={expenses} />
+			<ExpenseStatistics expenses={expenses} />
 		</main>
 	);
 }
 
-export function links() {
-	return [
-		{
-			rel: 'stylesheet',
-			href: expensesStyles,
-		},
-	];
+export async function loader() {
+	const expenses = await getExpenses();
+
+	if (!expenses || expenses.length === 0) {
+		throw json(
+			{
+				message: 'Could not load expenses for the requested analysis.',
+			},
+			{
+				status: 404,
+				statusText: 'Expenses not found',
+			},
+		);
+	}
+
+	return expenses;
 }
+
+export const CatchBoundary: CatchBoundaryComponent = () => {
+	const caughtResponse = useCatch();
+
+	return (
+		<main>
+			<Error title={caughtResponse.statusText}>
+				<p>
+					{caughtResponse.data?.message ||
+						'Something went wrong - could not load expenses'}
+				</p>
+			</Error>
+		</main>
+	);
+};
