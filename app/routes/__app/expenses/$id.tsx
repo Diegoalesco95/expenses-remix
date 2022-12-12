@@ -1,4 +1,4 @@
-import type { ActionFunction } from '@remix-run/node';
+import type { ActionFunction, MetaFunction } from '@remix-run/node';
 import type { Expense } from '~/interfaces/expense.interface';
 
 import { redirect } from '@remix-run/node';
@@ -44,4 +44,15 @@ export const action: ActionFunction = async ({ params, request }) => {
 			deletedId: expenseId,
 		};
 	}
+};
+
+export const meta: MetaFunction = ({ params, parentsData }) => {
+	const expense = parentsData['routes/__app/expenses'].find(
+		(expense) => expense.id === params.id,
+	);
+
+	return {
+		title: expense.title,
+		description: 'Update expense',
+	};
 };

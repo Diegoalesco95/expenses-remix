@@ -1,4 +1,4 @@
-import type { LoaderFunction } from '@remix-run/node';
+import type { HeadersFunction, LoaderFunction } from '@remix-run/node';
 import { Outlet } from '@remix-run/react';
 import MainHeader from '~/components/navigation/MainHeader';
 import { getUserFromSession } from '~/data/auth.server';
@@ -25,3 +25,7 @@ export function links() {
 		},
 	];
 }
+
+export const headers: HeadersFunction = () => ({
+	'Cache-Control': 'max-age=3600',
+});
